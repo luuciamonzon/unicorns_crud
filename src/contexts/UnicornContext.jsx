@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export const UnicornContext = createContext(null);
 
-const API_BASE_URL = 'https://crudcrud.com/api/d6fb9d41aaef4f7c85cb51e424d49055/unicorns';
+const API_BASE_URL = 'https://crudcrud.com/api/00823b00cf0b4e5090785bda3edb80c7/unicorns';
 
 export const UnicornProvider = ({ children }) => {
   const [unicorns, setUnicorns] = useState([]);
@@ -30,8 +30,24 @@ export const UnicornProvider = ({ children }) => {
   const editUnicorn = async (unicorn) => {
     try {
       const { _id, ...unicornData } = unicorn;
-      const response = await axios.put(API_BASE_URL + '/' + _id, unicornData);
-      setUnicorns(prevUnicorns => prevUnicorns.map(u => (u._id === unicorn._id ? response.data : u)));
+
+      if (!_id) {
+        console.error('Unicorn ID is missing');
+        return;
+      }
+
+      console.log('Editing unicorn:', unicorn);
+      console.log('Editing unicorn with ID:', _id);
+      console.log('Data to update:', unicornData);
+
+      const response = await axios.put(`${API_BASE_URL}/${_id}`, unicornData);
+
+      // Combinar manualmente los datos si la respuesta no incluye todos los campos
+      const updatedUnicorn = { _id, ...unicornData, ...response.data };
+
+      setUnicorns(prevUnicorns =>
+        prevUnicorns.map(u => (u._id === _id ? updatedUnicorn : u))
+      );
     } catch (error) {
       console.error('Error editing unicorn:', error);
     }
@@ -46,6 +62,22 @@ export const UnicornProvider = ({ children }) => {
     }
   };
 
+  const handleSubmit = (values, actions) => {
+    if (unicornToEdit) {
+      // Verificar que unicornToEdit tenga un _id válido
+      if (!unicornToEdit._id) {
+        console.error('Unicorn to edit does not have a valid ID');
+        return;
+      }
+
+      // Combinar el _id con los valores del formulario
+      editUnicorn({ _id: unicornToEdit._id, ...values });
+    } else {
+      createUnicorn(values);
+    }
+    navigate('/unicornios');
+  };
+
   useEffect(() => {
     getUnicorns();
   }, [getUnicorns]);
@@ -57,6 +89,7 @@ export const UnicornProvider = ({ children }) => {
     createUnicorn,
     editUnicorn,
     deleteUnicorn,
+    handleSubmit,
   };
 
   return (

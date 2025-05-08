@@ -7,7 +7,7 @@ export default function(app) {
       target: 'https://crudcrud.com',
       changeOrigin: true,
       pathRewrite: {
-        '^/api': '/api/d6fb9d41aaef4f7c85cb51e424d49055', 
+        '^/api': '/api/00823b00cf0b4e5090785bda3edb80c7', 
       },
       logLevel: 'debug',
       onProxyRes: (proxyRes) => {

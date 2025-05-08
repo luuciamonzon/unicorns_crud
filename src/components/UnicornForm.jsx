@@ -21,6 +21,10 @@ const UnicornForm = () => {
 
   const unicornToEdit = id ? unicorns.find((unicorn) => unicorn._id === id) : null;
 
+  if (id && !unicornToEdit) {
+    console.error(`No unicorn found with ID: ${id}`);
+  }
+
   const initialValues = {
     name: unicornToEdit?.name || '',
     age: unicornToEdit?.age || '',
@@ -29,8 +33,12 @@ const UnicornForm = () => {
   };
 
   const handleSubmit = (values, actions) => {
+    console.log('Unicorn to edit:', unicornToEdit);
+    console.log('Form values:', values);
+
     if (unicornToEdit) {
-      editUnicorn(unicornToEdit._id, values);
+      // Combinar el _id con los valores del formulario
+      editUnicorn({ _id: unicornToEdit._id, ...values });
     } else {
       createUnicorn(values);
     }
